@@ -1,31 +1,4 @@
-// import React from 'react';
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './styles/globals.css';
 import CustomCursor from './components/CustomCursor';
@@ -36,7 +9,7 @@ import AudioPulse from './components/AudioPulse';
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
-  const appRef = useRef<HTMLDivElement>(null);
+  const [audioLevel, setAudioLevel] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,7 +19,7 @@ function App() {
   }, []);
 
   return (
-    <div className="app-container" ref={appRef}>
+    <div className="app-container">
       <CustomCursor />
       <NeuralBackground />
       
@@ -77,13 +50,17 @@ function App() {
               }}>
                 SENTIMENT AURA
               </h1>
-              <div style={{ 
-                width: '200px', 
-                height: '2px', 
-                background: 'var(--aurora-gradient)',
-                margin: '0 auto',
-                animation: 'pulse-line 1s ease-in-out infinite'
-              }} />
+              <motion.div 
+                animate={{ scaleX: [0, 1] }}
+                transition={{ duration: 1.5 }}
+                style={{ 
+                  width: '200px', 
+                  height: '2px', 
+                  background: 'var(--aurora-gradient)',
+                  margin: '0 auto',
+                  transformOrigin: 'left',
+                }} 
+              />
             </div>
           </motion.div>
         ) : null}
@@ -104,19 +81,21 @@ function App() {
             justifyContent: 'center',
           }}
         >
+          {/* Emotion Orb - centered */}
           <EmotionOrb emotion={currentEmotion} />
-          <AudioPulse onEmotionDetected={setCurrentEmotion} />
           
-          {/* floating UI elements here */}
-          <div className="floating-interface" style={{
+          {/* Audio controls with proper positioning */}
+          <div style={{
             position: 'absolute',
-            top: '2rem',
-            left: '2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            zIndex: 100,
+            bottom: '100px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10,
           }}>
+            <AudioPulse 
+              onEmotionDetected={setCurrentEmotion}
+              onAudioLevel={setAudioLevel}
+            />
           </div>
         </motion.main>
       )}
