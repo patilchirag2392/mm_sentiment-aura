@@ -20,6 +20,8 @@ export const useAudioCapture = () => {
   const analyzerRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamCallbackRef = useRef<((data: ArrayBuffer) => void) | null>(null);
 
   const monitorAudioLevel = useCallback(() => {
     if (!analyzerRef.current || !audioState.isRecording) return;
@@ -29,7 +31,7 @@ export const useAudioCapture = () => {
     analyzer.getByteFrequencyData(dataArray);
 
     let sum = 0;
-    const relevantFrequencies = dataArray.slice(4, 40); 
+    const relevantFrequencies = dataArray.slice(4, 40);
     relevantFrequencies.forEach((value) => {
       sum += value * value;
     });
@@ -51,15 +53,14 @@ export const useAudioCapture = () => {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
+          sampleRate: 16000, 
         }
       });
 
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({
-        sampleRate: 16000,
-      });
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
 
       const analyzer = audioContext.createAnalyser();
-      analyzer.fftSize = 256; 
+      analyzer.fftSize = 256;
       analyzer.smoothingTimeConstant = 0.3;
 
       const source = audioContext.createMediaStreamSource(stream);
@@ -86,6 +87,90 @@ export const useAudioCapture = () => {
       }));
       throw error;
     }
+  }, []);
+
+  const startAudioStreaming = useCallback((callback: (audioData: ArrayBuffer) => void) => {
+    if (!mediaStreamRef.current) {
+      console.error('Audio not initialized');
+      return;
+    }
+
+    streamCallbackRef.current = callback;
+
+    const options = {
+      mimeType: 'audio/webm;codecs=opus',
+      audioBitsPerSecond: 16000
+    };
+
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      options.mimeType = 'audio/webm';
+    }
+
+    try {
+      const mediaRecorder = new MediaRecorder(mediaStreamRef.current, options);
+      
+      mediaRecorder.ondataavailable = async (event) => {
+        if (event.data.size > 0 && streamCallbackRef.current) {
+          const arrayBuffer = await event.data.arrayBuffer();
+          streamCallbackRef.current(arrayBuffer);
+        }
+      };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+      };
+
+      mediaRecorder.start(100); 
+      mediaRecorderRef.current = mediaRecorder;
+      
+      console.log('Audio streaming started');
+    } catch (error) {
+      console.error('Failed to start audio streaming:', error);
+      
+      startAlternativeStreaming(callback);
+    }
+  }, []);
+
+  const startAlternativeStreaming = useCallback((callback: (audioData: ArrayBuffer) => void) => {
+    if (!mediaStreamRef.current || !audioContextRef.current) {
+      console.error('Audio not initialized for alternative streaming');
+      return;
+    }
+
+    const audioContext = audioContextRef.current;
+    const source = audioContext.createMediaStreamSource(mediaStreamRef.current);
+    
+    const bufferSize = 2048;
+    const dataArray = new Float32Array(bufferSize);
+    
+    const processAudio = () => {
+      if (!analyzerRef.current || !audioState.isRecording) return;
+      
+      analyzerRef.current.getFloatTimeDomainData(dataArray);
+      
+      const int16Array = new Int16Array(bufferSize);
+      for (let i = 0; i < dataArray.length; i++) {
+        const s = Math.max(-1, Math.min(1, dataArray[i]));
+        int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      }
+      
+      callback(int16Array.buffer);
+      
+      if (audioState.isRecording) {
+        setTimeout(processAudio, 100); 
+      }
+    };
+    
+    processAudio();
+  }, [audioState.isRecording]);
+
+  const stopAudioStreaming = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    }
+    streamCallbackRef.current = null;
+    console.log('Audio streaming stopped');
   }, []);
 
   const startRecording = useCallback(async () => {
@@ -121,6 +206,8 @@ export const useAudioCapture = () => {
   const stopRecording = useCallback(() => {
     if (!audioState.isRecording) return;
 
+    stopAudioStreaming();
+
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
@@ -141,10 +228,11 @@ export const useAudioCapture = () => {
       }
     };
     fadeOut();
-  }, [audioState.isRecording, audioState.audioLevel]);
+  }, [audioState.isRecording, audioState.audioLevel, stopAudioStreaming]);
 
   useEffect(() => {
     return () => {
+      stopAudioStreaming();
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -158,7 +246,7 @@ export const useAudioCapture = () => {
         audioContextRef.current.close();
       }
     };
-  }, []);
+  }, [stopAudioStreaming]);
 
   const getFrequencyData = useCallback((): Uint8Array => {
     if (!analyzerRef.current) return new Uint8Array(128);
@@ -182,6 +270,8 @@ export const useAudioCapture = () => {
     stopRecording,
     getFrequencyData,
     getWaveformData,
+    startAudioStreaming,
+    stopAudioStreaming,
     mediaStream: mediaStreamRef.current,
   };
 };
