@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './styles/globals.css';
 import CustomCursor from './components/CustomCursor';
-import NeuralBackground from './components/NeuralBackground';
+import AuraVisualization from './components/AuraVisualization';
 import EmotionOrb from './components/EmotionOrb';
 import AudioPulse from './components/AudioPulse';
 import TranscriptDisplay from './components/TranscriptDisplay';
@@ -45,7 +45,7 @@ function App() {
   };
 
   const handleSentimentUpdate = (data: SentimentData) => {
-    console.log(' App received sentiment data:', data);
+    console.log('📊 App received sentiment data:', data);
     console.log('   Emotion:', data.emotion);
     console.log('   Score:', data.sentiment_score);
     console.log('   Intensity:', data.intensity);
@@ -57,19 +57,26 @@ function App() {
   };
 
   useEffect(() => {
-    console.log('🎨 Current emotion changed to:', currentEmotion);
+    console.log(' Current emotion changed to:', currentEmotion);
   }, [currentEmotion]);
 
   useEffect(() => {
     if (sentimentData) {
-      console.log('📈 Sentiment data state updated:', sentimentData);
+      console.log(' Sentiment data state updated:', sentimentData);
     }
   }, [sentimentData]);
 
   return (
     <div className="app-container">
       <CustomCursor />
-      <NeuralBackground />
+
+      {/* Perlin Noise Aura Background */}
+      <AuraVisualization 
+        emotion={currentEmotion}
+        sentimentScore={sentimentData?.sentiment_score || 0}
+        intensity={sentimentData?.intensity || 0.5}
+        isActive={isRecording}
+      />
       
       <AnimatePresence>
         {!isInitialized ? (
@@ -143,7 +150,7 @@ function App() {
             fullTranscript={fullTranscript}
             isRecording={isRecording}
           />
-
+          
           {/* Keywords Display - right side */}
           <KeywordsDisplay 
             keywords={keywords}
