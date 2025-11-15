@@ -1,10 +1,6 @@
 export interface DeepgramConfig {
-  apiKey: string;
-  model?: string;
-  language?: string;
-  punctuate?: boolean;
-  interimResults?: boolean;
-  endpointing?: boolean;
+  apiKey?: string; 
+  backendUrl?: string; 
 }
 
 export interface TranscriptResult {
@@ -16,15 +12,15 @@ export interface TranscriptResult {
 
 export class DeepgramService extends EventTarget {
   private ws: WebSocket | null = null;
-  private apiKey: string;
   private isConnected: boolean = false;
   private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
+  private maxReconnectAttempts: number = 3;
   private reconnectDelay: number = 1000;
+  private backendUrl: string;
 
-  constructor(config: DeepgramConfig) {
+  constructor(config: DeepgramConfig = {}) {
     super();
-    this.apiKey = config.apiKey;
+    this.backendUrl = config.backendUrl || 'ws://localhost:8000/api/ws/transcribe';
   }
 
   private emit(eventName: string, data?: any) {
@@ -34,85 +30,98 @@ export class DeepgramService extends EventTarget {
   async connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        const params = new URLSearchParams({
-          model: 'nova-2',
-          language: 'en-US',
-          punctuate: 'true',
-          interim_results: 'true',
-          endpointing: '300',
-          vad_events: 'true',
-          smart_format: 'true',
-        });
-
-        const wsUrl = `wss://api.deepgram.com/v1/listen?${params.toString()}`;
+        console.log(' Connecting to backend WebSocket proxy...');
+        console.log(' URL:', this.backendUrl);
         
-        this.ws = new WebSocket(wsUrl, {
-          headers: {
-            Authorization: `Token ${this.apiKey}`,
-          },
-        } as any);
-
+        this.ws = new WebSocket(this.backendUrl);
         this.ws.binaryType = 'arraybuffer';
 
         this.ws.onopen = () => {
-          console.log('Deepgram WebSocket connected');
-          this.isConnected = true;
-          this.reconnectAttempts = 0;
-          this.emit('connected');
-          resolve();
+          console.log(' Connected to backend WebSocket proxy!');
+          console.log('   Backend will handle Deepgram connection with proper auth');
         };
 
         this.ws.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
             
-            if (data.channel && data.channel.alternatives) {
-              const alternative = data.channel.alternatives[0];
-              if (alternative.transcript && alternative.transcript.trim() !== '') {
+            console.log(' Message from backend:', data.type);
+            
+            switch (data.type) {
+              case 'connected':
+                console.log(' Backend successfully connected to Deepgram!');
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+                this.emit('connected');
+                resolve();
+                break;
+              
+              case 'transcript':
                 const result: TranscriptResult = {
-                  transcript: alternative.transcript,
+                  transcript: data.transcript,
                   isFinal: data.is_final || false,
-                  confidence: alternative.confidence || 0,
+                  confidence: data.confidence || 0,
                   timestamp: Date.now(),
                 };
-                
+                console.log(' Transcript:', result.transcript, '| Final:', result.isFinal);
                 this.emit('transcript', result);
-                
-                if (process.env.REACT_APP_DEBUG === 'true') {
-                  console.log('Transcript:', result.transcript, 'Final:', result.isFinal);
-                }
-              }
-            }
-
-            if (data.type === 'SpeechStarted') {
-              this.emit('speechStarted');
-            } else if (data.type === 'SpeechEnded') {
-              this.emit('speechEnded');
+                break;
+              
+              case 'speechstarted':
+                console.log(' Speech started');
+                this.emit('speechStarted');
+                break;
+              
+              case 'speechended':
+                console.log(' Speech ended');
+                this.emit('speechEnded');
+                break;
+              
+              case 'error':
+                console.error(' Backend error:', data.message);
+                this.emit('error', new Error(data.message));
+                reject(new Error(data.message));
+                break;
+              
+              default:
+                console.log(' Unknown message type:', data.type);
             }
 
           } catch (error) {
-            console.error('Error parsing Deepgram message:', error);
+            console.error(' Error parsing message from backend:', error);
           }
         };
 
         this.ws.onerror = (error) => {
-          console.error('Deepgram WebSocket error:', error);
+          console.error(' Backend WebSocket error:', error);
+          console.error('   Make sure your backend is running on http://localhost:8000');
+          console.error('   Start backend with: cd backend && python main.py');
+          this.isConnected = false;
           this.emit('error', error);
-          reject(error);
+          reject(new Error('Failed to connect to backend'));
         };
 
         this.ws.onclose = (event) => {
-          console.log('Deepgram WebSocket closed:', event.code, event.reason);
+          console.log(' Backend WebSocket closed');
+          console.log('   Code:', event.code);
+          console.log('   Reason:', event.reason || 'No reason provided');
           this.isConnected = false;
           this.emit('disconnected');
           
-          if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+          if (event.code === 1006) {
+            console.error(' Connection closed abnormally');
+            console.error('   Possible causes:');
+            console.error('   1. Backend server not running (cd backend && python main.py)');
+            console.error('   2. Backend failed to connect to Deepgram');
+            console.error('   3. Network issues');
+            console.error('   4. Deepgram API key invalid or missing in backend/.env');
+          } else if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
             this.attemptReconnect();
           }
         };
 
       } catch (error) {
-        console.error('Failed to connect to Deepgram:', error);
+        console.error(' Failed to create WebSocket:', error);
         reject(error);
       }
     });
@@ -120,11 +129,11 @@ export class DeepgramService extends EventTarget {
 
   private attemptReconnect(): void {
     this.reconnectAttempts++;
-    console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+    console.log(` Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
     
     setTimeout(() => {
       this.connect().catch(error => {
-        console.error('Reconnection failed:', error);
+        console.error(' Reconnection failed:', error);
       });
     }, this.reconnectDelay * this.reconnectAttempts);
   }
@@ -133,12 +142,24 @@ export class DeepgramService extends EventTarget {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(audioData);
     } else {
-      console.warn('WebSocket not ready for audio data');
+      console.warn(' WebSocket not ready. State:', this.ws?.readyState);
+      if (!this.ws) {
+        console.warn('   WebSocket is null - connection not established');
+      } else {
+        const states = {
+          0: 'CONNECTING',
+          1: 'OPEN',
+          2: 'CLOSING',
+          3: 'CLOSED'
+        };
+        console.warn('   Current state:', states[this.ws.readyState as keyof typeof states]);
+      }
     }
   }
 
   disconnect(): void {
     if (this.ws) {
+      console.log(' Closing backend connection...');
       this.isConnected = false;
       this.ws.close(1000, 'Client disconnect');
       this.ws = null;
@@ -146,6 +167,6 @@ export class DeepgramService extends EventTarget {
   }
 
   getConnectionStatus(): boolean {
-    return this.isConnected;
+    return this.isConnected && this.ws?.readyState === WebSocket.OPEN;
   }
 }

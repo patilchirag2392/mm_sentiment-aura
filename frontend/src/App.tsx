@@ -5,11 +5,16 @@ import CustomCursor from './components/CustomCursor';
 import NeuralBackground from './components/NeuralBackground';
 import EmotionOrb from './components/EmotionOrb';
 import AudioPulse from './components/AudioPulse';
+import TranscriptDisplay from './components/TranscriptDisplay';
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
-  const [audioLevel, setAudioLevel] = useState(0);
+  // const [audioLevel, setAudioLevel] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [fullTranscript, setFullTranscript] = useState<string[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -17,6 +22,16 @@ function App() {
     }, 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleTranscript = (text: string, isFinal: boolean) => {
+    if (isFinal) {
+      setTranscript(text);
+      setFullTranscript(prev => [...prev, text]);
+      setInterimTranscript('');
+    } else {
+      setInterimTranscript(text);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -84,7 +99,15 @@ function App() {
           {/* Emotion Orb - centered */}
           <EmotionOrb emotion={currentEmotion} />
           
-          {/* Audio controls with proper positioning */}
+          {/* Transcript Display - left side */}
+          <TranscriptDisplay 
+            transcript={transcript}
+            interimTranscript={interimTranscript}
+            fullTranscript={fullTranscript}
+            isRecording={isRecording}
+          />
+          
+          {/* Audio controls */}
           <div style={{
             position: 'absolute',
             bottom: '100px',
@@ -94,7 +117,11 @@ function App() {
           }}>
             <AudioPulse 
               onEmotionDetected={setCurrentEmotion}
-              onAudioLevel={setAudioLevel}
+              onAudioLevel={(level) => {
+                // setAudioLevel(level);
+                setIsRecording(level > 0);
+              }}
+              onTranscript={handleTranscript}
             />
           </div>
         </motion.main>

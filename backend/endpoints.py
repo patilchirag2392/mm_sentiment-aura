@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, WebSocket
 from typing import Dict, Any
 import logging
 import asyncio
 from models import TextProcessRequest, TextProcessResponse, ErrorResponse  
 from claude_service import get_claude_service  
-from config import settings  
+from config import settings
+from deepgram_proxy import websocket_transcribe_handler  
 
 logger = logging.getLogger(__name__)
 
@@ -127,3 +128,10 @@ async def get_available_models() -> Dict[str, Any]:
             }
         ]
     }
+
+@router.websocket("/ws/transcribe")
+async def websocket_transcribe(websocket: WebSocket):
+    """
+    WebSocket endpoint for Deepgram transcription proxy.
+    """
+    await websocket_transcribe_handler(websocket)
