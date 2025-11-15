@@ -16,12 +16,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+import endpoints
+from config import settings
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle startup and shutdown events."""
     logger.info("Starting up the Sentiment Aura backend...")
     logger.info("AI Provider: Anthropic Claude")
     logger.info("This is a proxy service")
+
+    # validate settings
+    try:
+        settings.validate()
+        logger.info("Configuration settings validated successfully.")
+    except ValueError as e:
+        logger.error(f"Configuration error: {e}")
+
     yield
     logger.info("Shutting down the Sentiment Aura backend...")
 
@@ -42,6 +53,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(endpoints.router)
+
 @app.get("/")
 async def root():
     """Root endpoint with service info."""
@@ -54,6 +67,7 @@ async def root():
             "health": "/api/health",
             "process_text": "/api/process_text (POST)",
             "status": "/api/status",
+            "models": "/api/models",
             "docs": "/docs"
         }
     }

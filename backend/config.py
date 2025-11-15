@@ -21,12 +21,11 @@ class Settings:
     # claude configuration
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     
-    # options: claude-3-opus-20240229, claude-3-sonnet-20240229, claude-3-haiku-20240307
-    CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-3-sonnet-20240229")
+    CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-3-haiku-20240307")
     
     # API parameters
-    MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", 200))
-    TEMPERATURE: float = float(os.getenv("TEMPERATURE", 0.7))
+    MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", 300))
+    TEMPERATURE: float = float(os.getenv("TEMPERATURE", 0.3))
     
     # rate limiting
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", 60))
@@ -48,18 +47,22 @@ class Settings:
         
         valid_models = [
             "claude-3-opus-20240229",
-            "claude-3-sonnet-20240229", 
-            "claude-3-haiku-20240307",
+            "claude-3-sonnet-20240229",
+            "claude-3-haiku-20240307",      # using this
             "claude-2.1",
-            "claude-2.0"
+            "claude-2.0",
+            "claude-instant-1.2"
         ]
         
+        # check if model is valid
         if cls.CLAUDE_MODEL not in valid_models:
             logger.warning(
                 f"Unknown Claude model: {cls.CLAUDE_MODEL}. "
-                f"Using default: claude-3-sonnet-20240229"
+                f"Using default: claude-3-haiku-20240307"
             )
-            cls.CLAUDE_MODEL = "claude-3-sonnet-20240229"
+            cls.CLAUDE_MODEL = "claude-3-haiku-20240307"
+
+        logger.info(f"Using Claude model: {cls.CLAUDE_MODEL}") 
         
         return True
 
