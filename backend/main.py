@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 import endpoints
 from config import settings
+from error_handler import ErrorHandlingMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,6 +44,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# add error handling middleware
+app.add_middleware(ErrorHandlingMiddleware)
 
 # configure CORS
 app.add_middleware(
