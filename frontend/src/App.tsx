@@ -45,32 +45,15 @@ function App() {
   };
 
   const handleSentimentUpdate = (data: SentimentData) => {
-    console.log(' App received sentiment data:', data);
-    console.log('   Emotion:', data.emotion);
-    console.log('   Score:', data.sentiment_score);
-    console.log('   Intensity:', data.intensity);
-    console.log('   Keywords:', data.keywords);
-    
     setSentimentData(data);
     setCurrentEmotion(data.emotion);
     setKeywords(data.keywords || []);
   };
 
-  useEffect(() => {
-    console.log(' Current emotion changed to:', currentEmotion);
-  }, [currentEmotion]);
-
-  useEffect(() => {
-    if (sentimentData) {
-      console.log(' Sentiment data state updated:', sentimentData);
-    }
-  }, [sentimentData]);
-
   return (
     <div className="app-container">
       <CustomCursor />
-      
-      {/* Perlin Noise Aura Background */}
+
       <AuraVisualization 
         emotion={currentEmotion}
         sentimentScore={sentimentData?.sentiment_score || 0}
@@ -136,14 +119,12 @@ function App() {
             justifyContent: 'center',
           }}
         >
-          {/* Emotion Orb - centered, responds to sentiment */}
           <EmotionOrb 
             emotion={currentEmotion}
             sentimentScore={sentimentData?.sentiment_score || 0}
             intensity={sentimentData?.intensity || 0.5}
           />
 
-          {/* Transcript Display - left side */}
           <TranscriptDisplay 
             transcript={transcript}
             interimTranscript={interimTranscript}
@@ -151,13 +132,11 @@ function App() {
             isRecording={isRecording}
           />
           
-          {/* Keywords Display - right side */}
           <KeywordsDisplay 
             keywords={keywords}
             isRecording={isRecording}
           />
           
-          {/* Audio controls */}
           <div style={{
             position: 'absolute',
             bottom: '100px',

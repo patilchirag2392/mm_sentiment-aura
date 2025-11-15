@@ -24,15 +24,7 @@ class ClaudeService:
         self.model = settings.CLAUDE_MODEL
         
         logger.info(f"Initialized Claude service with model: {self.model}")
-        
-        # log model capabilities
-        model_info = {
-            "claude-3-opus-20240229": "Most capable, best for complex analysis",
-            "claude-3-sonnet-20240229": "Balanced performance and speed",
-            "claude-3-haiku-20240307": "Fastest response times"                 # using this
-        }
-        logger.info(f"Model capability: {model_info.get(self.model, 'Standard')}")
-    
+
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
