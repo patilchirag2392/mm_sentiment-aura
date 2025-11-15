@@ -6,6 +6,7 @@ import NeuralBackground from './components/NeuralBackground';
 import EmotionOrb from './components/EmotionOrb';
 import AudioPulse from './components/AudioPulse';
 import TranscriptDisplay from './components/TranscriptDisplay';
+import KeywordsDisplay from './components/KeywordsDisplay';
 
 interface SentimentData {
   sentiment_score: number;
@@ -24,6 +25,7 @@ function App() {
   const [fullTranscript, setFullTranscript] = useState<string[]>([]);
   
   const [sentimentData, setSentimentData] = useState<SentimentData | null>(null);
+  const [keywords, setKeywords] = useState<string[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -47,9 +49,11 @@ function App() {
     console.log('   Emotion:', data.emotion);
     console.log('   Score:', data.sentiment_score);
     console.log('   Intensity:', data.intensity);
+    console.log('   Keywords:', data.keywords);
     
     setSentimentData(data);
     setCurrentEmotion(data.emotion);
+    setKeywords(data.keywords || []);
   };
 
   useEffect(() => {
@@ -137,6 +141,12 @@ function App() {
             transcript={transcript}
             interimTranscript={interimTranscript}
             fullTranscript={fullTranscript}
+            isRecording={isRecording}
+          />
+
+          {/* Keywords Display - right side */}
+          <KeywordsDisplay 
+            keywords={keywords}
             isRecording={isRecording}
           />
           
