@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Orbitron:wght@400;900&display=swap');
+
+:root {
+  --void-black: #0a0a0f;
+  --deep-purple: #1a0033;
+  --electric-violet: #6b46c1;
+  --neon-cyan: #00ffff;
+  --bio-green: #00ff88;
+  --plasma-pink: #ff00ff;
+  --data-orange: #ff6b2b;
+
+  --aurora-gradient: linear-gradient(125deg, 
+    var(--electric-violet) 0%, 
+    var(--neon-cyan) 25%, 
+    var(--bio-green) 50%, 
+    var(--plasma-pink) 75%, 
+    var(--electric-violet) 100%);
+  
+  --depth-gradient: radial-gradient(ellipse at center, 
+    transparent 0%, 
+    rgba(10, 10, 15, 0.4) 50%, 
+    rgba(10, 10, 15, 0.9) 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: none; 
+}
+
+html {
+  font-size: 16px;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  background: var(--void-black);
+  color: var(--neon-cyan);
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neon-cyan);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease-out;
+  mix-blend-mode: difference;
+}
+
+.custom-cursor::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--bio-green);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.clicking {
+  transform: scale(0.8);
+  border-color: var(--plasma-pink);
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: 
+      0.05em 0 0 var(--neon-cyan),
+      -0.05em -0.025em 0 var(--plasma-pink),
+      0.025em 0.05em 0 var(--bio-green);
+  }
+  15% {
+    text-shadow: 
+      0.05em 0 0 var(--neon-cyan),
+      -0.05em -0.025em 0 var(--plasma-pink),
+      0.025em 0.05em 0 var(--bio-green);
+  }
+  16% {
+    text-shadow: 
+      -0.05em -0.025em 0 var(--neon-cyan),
+      0.025em 0.025em 0 var(--plasma-pink),
+      -0.05em -0.05em 0 var(--bio-green);
+  }
+  49% {
+    text-shadow: 
+      -0.05em -0.025em 0 var(--neon-cyan),
+      0.025em 0.025em 0 var(--plasma-pink),
+      -0.05em -0.05em 0 var(--bio-green);
+  }
+  50% {
+    text-shadow: 
+      0.025em 0.05em 0 var(--neon-cyan),
+      0.05em 0 0 var(--plasma-pink),
+      0 -0.05em 0 var(--bio-green);
+  }
+  99% {
+    text-shadow: 
+      0.025em 0.05em 0 var(--neon-cyan),
+      0.05em 0 0 var(--plasma-pink),
+      0 -0.05em 0 var(--bio-green);
+  }
+  100% {
+    text-shadow: 
+      -0.025em 0 0 var(--neon-cyan),
+      -0.025em -0.025em 0 var(--plasma-pink),
+      -0.025em -0.05em 0 var(--bio-green);
+  }
+}
+
+.glitch-text {
+  animation: glitch 2s infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { 
+    filter: brightness(1) saturate(1); 
+    transform: scale(1);
+  }
+  50% { 
+    filter: brightness(1.2) saturate(1.5); 
+    transform: scale(1.02);
+  }
+}
+
+@keyframes liquid-morph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+}
+
+.neural-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--electric-violet), 
+    transparent);
+  transform-origin: left center;
+  animation: pulse-line 3s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.5; }
+}
+
+.holographic {
+  background: linear-gradient(
+    45deg,
+    #ff00ff 0%,
+    #00ffff 25%,
+    #00ff00 50%,
+    #ffff00 75%,
+    #ff00ff 100%
+  );
+  background-size: 400% 400%;
+  animation: holographic-shift 3s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes holographic-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.quantum-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--bio-green);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 10px var(--bio-green),
+    0 0 20px var(--bio-green);
+  animation: quantum-float 10s infinite;
+}
+
+@keyframes quantum-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(100vw, -100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
