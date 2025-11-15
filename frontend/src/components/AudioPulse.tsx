@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudioCapture } from '../hooks/useAudioCapture';
 import { DeepgramService } from '../services/deepgramService';
-import './AudioPulse.css';
+import './AudioPulse.css'
 
 interface AudioPulseProps {
   onEmotionDetected: (emotion: string) => void;
   onAudioLevel?: (level: number) => void;
   onTranscript?: (transcript: string, isFinal: boolean) => void;
-  onSentimentUpdate?: (sentiment: SentimentData) => void;  
+  onSentimentUpdate?: (sentiment: SentimentData) => void;
+  currentEmotion?: string;  
 }
 
 interface SentimentData {
@@ -23,7 +24,8 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
   onEmotionDetected,
   onAudioLevel,
   onTranscript,
-  onSentimentUpdate 
+  onSentimentUpdate,
+  currentEmotion = 'neutral' 
 }) => {
   const { 
     audioState, 

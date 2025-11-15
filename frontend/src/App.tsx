@@ -45,7 +45,7 @@ function App() {
   };
 
   const handleSentimentUpdate = (data: SentimentData) => {
-    console.log('📊 App received sentiment data:', data);
+    console.log(' App received sentiment data:', data);
     console.log('   Emotion:', data.emotion);
     console.log('   Score:', data.sentiment_score);
     console.log('   Intensity:', data.intensity);
@@ -69,7 +69,7 @@ function App() {
   return (
     <div className="app-container">
       <CustomCursor />
-
+      
       {/* Perlin Noise Aura Background */}
       <AuraVisualization 
         emotion={currentEmotion}
@@ -142,7 +142,7 @@ function App() {
             sentimentScore={sentimentData?.sentiment_score || 0}
             intensity={sentimentData?.intensity || 0.5}
           />
-          
+
           {/* Transcript Display - left side */}
           <TranscriptDisplay 
             transcript={transcript}

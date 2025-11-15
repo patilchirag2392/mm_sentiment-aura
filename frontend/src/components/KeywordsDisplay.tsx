@@ -117,3 +117,4 @@ const KeywordsDisplay: React.FC<KeywordsDisplayProps> = ({ keywords, isRecording
 };
 
 export default KeywordsDisplay;
+
