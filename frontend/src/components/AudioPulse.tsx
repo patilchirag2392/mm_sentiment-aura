@@ -8,12 +8,22 @@ interface AudioPulseProps {
   onEmotionDetected: (emotion: string) => void;
   onAudioLevel?: (level: number) => void;
   onTranscript?: (transcript: string, isFinal: boolean) => void;
+  onSentimentUpdate?: (sentiment: SentimentData) => void;  
+}
+
+interface SentimentData {
+  sentiment_score: number;
+  emotion: string;
+  intensity: number;
+  keywords: string[];
+  confidence: number;
 }
 
 const AudioPulse: React.FC<AudioPulseProps> = ({ 
   onEmotionDetected,
   onAudioLevel,
-  onTranscript
+  onTranscript,
+  onSentimentUpdate 
 }) => {
   const { 
     audioState, 
@@ -36,6 +46,44 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
     interim: '',
     full: [] as string[]
   });
+
+  const analyzeSentiment = useCallback(async (text: string) => {
+    if (!text || !text.trim()) return;
+    
+    try {
+      console.log(' Analyzing sentiment for:', text);
+      
+      const response = await fetch('http://localhost:8000/api/process_text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data: SentimentData = await response.json();
+      
+      console.log(' Sentiment analysis result:', data);
+      console.log(`   Emotion: ${data.emotion}`);
+      console.log(`   Score: ${data.sentiment_score}`);
+      console.log(`   Keywords: ${data.keywords.join(', ')}`);
+      
+      if (onEmotionDetected) {
+        onEmotionDetected(data.emotion);
+      }
+      
+      if (onSentimentUpdate) {
+        onSentimentUpdate(data);
+      }
+      
+    } catch (error) {
+      console.error(' Error analyzing sentiment:', error);
+    }
+  }, [onEmotionDetected, onSentimentUpdate]);
 
   const initializeDeepgram = useCallback(async () => {
     console.log(' Initializing connection to backend...');
@@ -64,9 +112,12 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
               interim: '',
               full: [...prev.full, finalText]
             }));
+            
             if (onTranscript) {
               onTranscript(finalText, true);
             }
+            
+            analyzeSentiment(finalText);
           }
         } else {
           setTranscriptState(prev => ({
@@ -93,14 +144,10 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
       return true;
     } catch (error) {
       console.error(' Failed to initialize:', error);
-      console.error('   Make sure the backend is running:');
-      console.error('   1. Open terminal');
-      console.error('   2. cd backend');
-      console.error('   3. python main.py');
       setConnectionStatus('error');
       return false;
     }
-  }, [onTranscript]);
+  }, [onTranscript, analyzeSentiment]);
 
   const disconnectDeepgram = useCallback(() => {
     if (deepgramRef.current) {
@@ -117,16 +164,12 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
       stopAudioStreaming();
       disconnectDeepgram();
     } else {
-      console.log('🎤 Starting recording...');
+      console.log(' Starting recording...');
       
       if (connectionStatus !== 'connected') {
         const connected = await initializeDeepgram();
         if (!connected) {
           console.error(' Failed to connect to backend');
-          console.error('   Troubleshooting:');
-          console.error('   1. Check backend is running: http://localhost:8000/api/health');
-          console.error('   2. Check backend/.env has DEEPGRAM_API_KEY');
-          console.error('   3. Check backend logs for errors');
           return;
         }
       }
@@ -271,7 +314,6 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
 
   return (
     <div className="audio-pulse-container">
-      {/* Waveform visualization */}
       <AnimatePresence>
         {audioState.isRecording && (
           <motion.div
@@ -286,7 +328,6 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Record button */}
       <motion.button
         className={`record-button-redesigned ${audioState.isRecording ? 'recording' : ''}`}
         onClick={handleToggleRecording}
@@ -320,7 +361,6 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
         </div>
       </motion.button>
 
-      {/* Connection status indicator */}
       {connectionStatus !== 'idle' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -338,7 +378,6 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
         </motion.div>
       )}
 
-      {/* Frequency indicator */}
       <AnimatePresence>
         {audioState.isRecording && (
           <motion.div
@@ -366,7 +405,6 @@ const AudioPulse: React.FC<AudioPulseProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Error display */}
       {audioState.error && (
         <motion.div
           className="error-message-redesigned"
