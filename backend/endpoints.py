@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, WebSocket
 from typing import Dict, Any
 import logging
-import asyncio
-from models import TextProcessRequest, TextProcessResponse, ErrorResponse  
+import asyncio 
 from claude_service import get_claude_service  
 from config import settings
 from deepgram_proxy import websocket_transcribe_handler
