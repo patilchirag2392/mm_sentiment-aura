@@ -2,9 +2,9 @@
   position: fixed;
   right: 40px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%);  
   width: 320px;
-  max-height: 70vh;
+  max-height: 60vh; 
   z-index: 100;
   
   background: linear-gradient(
@@ -82,7 +82,10 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: flex-start;
-}
+  overflow-y: auto;
+  max-height: clamp(200px, calc(60vh - 140px), 450px);
+  transition: max-height 0.3s ease;
+} 
 
 .keyword-tag {
   position: relative;
@@ -146,6 +149,26 @@
   background-clip: text;
 }
 
+@media (max-height: 800px) {
+  .keywords-display-container {
+    max-height: 50vh;
+  }
+  
+  .keywords-grid {
+    max-height: calc(50vh - 100px);
+  }
+}
+
+@media (max-height: 700px) {
+  .keywords-display-container {
+    max-height: 45vh;
+  }
+  
+  .keywords-grid {
+    max-height: calc(45vh - 100px);
+  }
+}
+
 @media (max-width: 1400px) {
   .keywords-display-container {
     width: 280px;
@@ -181,4 +204,21 @@
 
 .keywords-display-container {
   animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.keywords-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.keywords-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.keywords-grid::-webkit-scrollbar-thumb {
+  background: rgba(107, 70, 193, 0.3);
+  border-radius: 2px;
+}
+
+.keywords-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 70, 193, 0.5);
 }

@@ -1,0 +1,140 @@
+.emotion-orb-container {
+  position: absolute;
+  top: 40%; 
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.7); 
+  pointer-events: none;
+  z-index: 5;
+  transition: transform 0.3s ease;
+}
+
+.audio-controls-wrapper {
+  position: absolute;
+  bottom: 60px;  
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: fit-content;
+  max-width: 90vw;
+}
+
+@media (min-height: 1000px) {
+  .emotion-orb-container {
+    transform: translate(-50%, -50%) scale(0.9);
+    top: 45%;
+  }
+}
+
+@media (max-height: 900px) {
+  .emotion-orb-container {
+    transform: translate(-50%, -50%) scale(0.65);
+    top: 38%;
+  }
+}
+
+@media (max-height: 800px) {
+  .emotion-orb-container {
+    transform: translate(-50%, -50%) scale(0.6);
+    top: 35%;
+  }
+  .audio-controls-wrapper {
+    bottom: 50px;
+  }
+}
+
+@media (max-height: 700px) {
+  .emotion-orb-container {
+    transform: translate(-50%, -50%) scale(0.5);
+    top: 32%;
+  }
+  .audio-controls-wrapper {
+    bottom: 45px;
+  }
+}
+
+@media (max-height: 600px) {
+  .emotion-orb-container {
+    transform: translate(-50%, -50%) scale(0.45);
+    top: 30%;
+  }
+  .audio-controls-wrapper {
+    bottom: 35px;
+  }
+}
+
+.transcript-container {
+  max-height: 60vh !important;
+  transition: all 0.3s ease;
+}
+
+.keywords-display-container {
+  max-height: 60vh !important;
+  transition: all 0.3s ease;
+}
+
+@media (max-height: 800px) {
+  .transcript-container,
+  .keywords-display-container {
+    max-height: 50vh !important;
+  }
+}
+
+@media (max-height: 700px) {
+  .transcript-container,
+  .keywords-display-container {
+    max-height: 45vh !important;
+  }
+}
+
+@media (max-width: 1400px) {
+  .transcript-container {
+    width: 300px !important;
+    left: 1.5rem !important;
+  }
+  .keywords-display-container {
+    width: 280px !important;
+    right: 1.5rem !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .transcript-container {
+    width: 260px !important;
+    left: 1rem !important;
+  }
+  .keywords-display-container {
+    width: 240px !important;
+    right: 1rem !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .transcript-container {
+    width: 240px !important;
+    left: 0.75rem !important;
+  }
+  .keywords-display-container {
+    width: 220px !important;
+    right: 0.75rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .transcript-container,
+  .keywords-display-container {
+    display: none !important;
+  }
+}
+
+.emotion-orb-container {
+  z-index: 5 !important;
+}
+
+.audio-controls-wrapper {
+  z-index: 10 !important;
+}
+
+.transcript-container,
+.keywords-display-container {
+  z-index: 100 !important;
+}

@@ -105,14 +105,10 @@ const EmotionOrb: React.FC<EmotionOrbProps> = ({
 
   return (
     <div style={{
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
       pointerEvents: 'none',
-      zIndex: 5,
+      transform: 'scale(0.8)',  
+      transition: 'transform 0.3s ease',
     }}>
-      {/* Outer orb layer */}
       <motion.div 
         style={{
           width: '200px',
@@ -132,7 +128,6 @@ const EmotionOrb: React.FC<EmotionOrbProps> = ({
         }}
       />
       
-      {/* Inner orb layer */}
       <motion.div 
         style={{
           position: 'absolute',
@@ -155,7 +150,6 @@ const EmotionOrb: React.FC<EmotionOrbProps> = ({
         }}
       />
 
-      {/* Emotion label */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -183,4 +177,3 @@ const EmotionOrb: React.FC<EmotionOrbProps> = ({
 };
 
 export default EmotionOrb;
-

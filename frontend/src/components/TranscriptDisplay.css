@@ -4,7 +4,7 @@
   top: 50%;
   transform: translateY(-50%);
   width: 350px;
-  max-height: 400px;
+  max-height: 60vh;
   background: rgba(10, 10, 15, 0.7);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 255, 255, 0.2);
@@ -40,7 +40,7 @@
 
 .transcript-content {
   padding: 1rem;
-  max-height: 350px;
+  max-height: calc(60vh - 80px); 
   overflow-y: auto;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.9rem;
@@ -88,4 +88,39 @@
 
 .transcript-content::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 255, 0.5);
+}
+
+@media (max-height: 800px) {
+  .transcript-container {
+    max-height: 50vh;
+  }
+  
+  .transcript-content {
+  max-height: clamp(250px, calc(60vh - 100px), 500px);
+  transition: max-height 0.3s ease;
+  }
+}
+
+@media (max-height: 700px) {
+  .transcript-container {
+    max-height: 45vh;
+  }
+  
+  .transcript-content {
+    max-height: calc(45vh - 80px);
+  }
+}
+
+@media (max-width: 1400px) {
+  .transcript-container {
+    width: 320px;
+    left: 1.5rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .transcript-container {
+    width: 280px;
+    left: 1rem;
+  }
 }

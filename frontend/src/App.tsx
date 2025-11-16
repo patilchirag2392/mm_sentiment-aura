@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './styles/globals.css';
+import './styles/responsive.css';
 import CustomCursor from './components/CustomCursor';
 import AuraVisualization from './components/AuraVisualization';
 import EmotionOrb from './components/EmotionOrb';
@@ -53,7 +54,7 @@ function App() {
   return (
     <div className="app-container">
       <CustomCursor />
-
+      
       <AuraVisualization 
         emotion={currentEmotion}
         sentimentScore={sentimentData?.sentiment_score || 0}
@@ -119,12 +120,14 @@ function App() {
             justifyContent: 'center',
           }}
         >
-          <EmotionOrb 
-            emotion={currentEmotion}
-            sentimentScore={sentimentData?.sentiment_score || 0}
-            intensity={sentimentData?.intensity || 0.5}
-          />
-
+          <div className="emotion-orb-container">
+            <EmotionOrb 
+              emotion={currentEmotion}
+              sentimentScore={sentimentData?.sentiment_score || 0}
+              intensity={sentimentData?.intensity || 0.5}
+            />
+          </div>
+          
           <TranscriptDisplay 
             transcript={transcript}
             interimTranscript={interimTranscript}
@@ -137,13 +140,7 @@ function App() {
             isRecording={isRecording}
           />
           
-          <div style={{
-            position: 'absolute',
-            bottom: '100px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 10,
-          }}>
+          <div className="audio-controls-wrapper">
             <AudioPulse 
               onEmotionDetected={setCurrentEmotion}
               onAudioLevel={(level) => {
