@@ -121,6 +121,8 @@ export const useAudioCapture = () => {
       streamCallbackRef.current = callback;
       isStreamingRef.current = true;
 
+      const processorName = `audio-processor-${Date.now()}`;
+
       const workletCode = `
         class AudioProcessor extends AudioWorkletProcessor {
           process(inputs, outputs, parameters) {
