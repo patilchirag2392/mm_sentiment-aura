@@ -18,17 +18,7 @@ const EMOTION_COLORS = {
     secondary: 'rgba(255, 165, 0, 0.3)',
     accent: 'rgba(255, 255, 0, 0.2)'
   },
-  excited: {
-    primary: 'rgba(255, 20, 147, 0.4)',     // Deep Pink
-    secondary: 'rgba(255, 99, 71, 0.3)',    // Tomato
-    accent: 'rgba(255, 215, 0, 0.2)'        // Gold
-  },
-  
-  calm: {
-    primary: 'rgba(0, 255, 136, 0.3)',      // Bio Green
-    secondary: 'rgba(107, 70, 193, 0.2)',   // Purple
-    accent: 'rgba(0, 255, 255, 0.1)'        // Cyan
-  },
+
   neutral: {
     primary: 'rgba(0, 255, 136, 0.3)',
     secondary: 'rgba(107, 70, 193, 0.2)',
@@ -78,12 +68,6 @@ const EMOTION_COLORS = {
     secondary: 'rgba(107, 142, 35, 0.2)',   // Olive Drab
     accent: 'rgba(128, 128, 0, 0.1)'        // Olive
   },
-  
-  anxious: {
-    primary: 'rgba(255, 140, 0, 0.4)',      // Dark Orange
-    secondary: 'rgba(255, 99, 71, 0.3)',    // Tomato
-    accent: 'rgba(255, 165, 0, 0.2)'        // Orange
-  }
 };
 
 const EmotionOrb: React.FC<EmotionOrbProps> = ({ 

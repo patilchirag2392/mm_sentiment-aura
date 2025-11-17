@@ -19,16 +19,6 @@ const EMOTION_PALETTES = {
     secondary: [255, 165, 0],
     accent: [255, 255, 100]
   },
-  excited: {
-    primary: [255, 20, 147],     // Deep Pink
-    secondary: [255, 99, 71],    // Tomato
-    accent: [255, 140, 0]        // Orange
-  },
-  calm: {
-    primary: [0, 255, 136],      // Bio Green
-    secondary: [107, 70, 193],   // Purple
-    accent: [0, 255, 255]        // Cyan
-  },
   neutral: {
     primary: [0, 255, 136],
     secondary: [107, 70, 193],
@@ -74,11 +64,6 @@ const EMOTION_PALETTES = {
     secondary: [107, 142, 35],   // Olive Drab
     accent: [128, 128, 0]        // Olive
   },
-  anxious: {
-    primary: [255, 140, 0],      // Dark Orange
-    secondary: [255, 99, 71],    // Tomato
-    accent: [255, 165, 0]        // Orange
-  }
 };
 
 class Particle {
