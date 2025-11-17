@@ -184,14 +184,11 @@ Frontend runs on: `http://localhost:3000`
 | Emotion | Colors | Visual Effect |
 |---------|--------|---------------|
 | **Happy/Joy** | Gold, Orange, Yellow | Warm, bright particles |
-| **Excited** | Pink, Tomato, Orange | Fast, energetic flow |
-| **Calm** | Green, Purple, Cyan | Slow, gentle movement |
 | **Neutral** | Cyan, Purple, Green | Default theme colors |
 | **Sad** | Royal Blue, Navy | Cool, slower flow |
 | **Angry** | Red, Dark Red | Intense, chaotic patterns |
 | **Fearful** | Purple, Indigo, Magenta | Dark, mysterious |
 | **Surprised** | Hot Pink, Salmon | Bright, dynamic |
-| **Anxious** | Orange, Tomato | Quick, jittery movement |
 
 ## Configuration
 
@@ -231,15 +228,6 @@ Frontend runs on: `http://localhost:3000`
 - Check backend logs for Claude API errors
 
 ## API Endpoints
-
-### GET /api/health
-Health check endpoint
-```json
-{
-  "status": "healthy",
-  "service": "sentiment-aura-backend"
-}
-```
 
 ### POST /api/process_text
 Analyze text sentiment
